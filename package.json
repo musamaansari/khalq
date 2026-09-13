@@ -1,0 +1,46 @@
+{
+  "name": "khalq",
+  "version": "1.0.0",
+  "description": "Khalq — software, AI and automation built around your ideas.",
+  "scripts": {
+    "test": "node --experimental-strip-types --test --test-isolation=none tests/*.test.ts",
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "notifications": "node --experimental-strip-types scripts/notifications.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/musamaansari/khalq.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/musamaansari/khalq/issues"
+  },
+  "homepage": "https://github.com/musamaansari/khalq#readme",
+  "dependencies": {
+    "@fontsource/geist": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "next": "^16.3.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.20.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "prettier": "^3.9.6",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "type": "module"
+}

@@ -1,0 +1,4 @@
+# This application is served by Next.js, not Apache's static file handler.
+# Prevent source code, environment files and the private SQLite database from
+# being downloaded through http://localhost/khalq/ in the XAMPP document root.
+Require all denied
