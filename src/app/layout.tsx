@@ -6,8 +6,9 @@ import "@fontsource/inter/latin-400.css";
 import "@fontsource/inter/latin-500.css";
 import "./globals.css";
 import { Header, Footer, InteractionAnalytics } from "@/components/shell";
+import { appUrl } from "@/lib/config";
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL || "https://khalq.io"),
+  metadataBase: new URL(appUrl()),
   title: { default: "Khalq — Create what’s next.", template: "%s — Khalq" },
   description:
     "Software, AI and automation built around your ideas. Khalq creates custom software, SaaS platforms, web and mobile applications, and integrations.",
@@ -34,7 +35,7 @@ export default function RootLayout({
         </a>
         <Header />
         {children}
-        <Footer />
+        <Footer contactEmail={process.env.CONTACT_EMAIL || ""} />
         <InteractionAnalytics />
       </body>
     </html>

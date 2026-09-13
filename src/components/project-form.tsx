@@ -3,6 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Arrow } from "./brand";
 import { requirementTypes } from "@/lib/content";
+import {
+  track,
+  visitorContext,
+  ensureAttribution,
+  selectedProject,
+  analyticsAllowed,
+} from "@/lib/client-tracking";
 const examples = [
   "Tell us your idea or business problem…",
   "I want to automate…",
@@ -10,15 +17,6 @@ const examples = [
   "Our business struggles with…",
   "I have an idea for…",
 ];
-export function track(event: string) {
-  if (navigator.doNotTrack === "1") return;
-  void fetch("/api/events", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event, page: location.pathname }),
-    keepalive: true,
-  }).catch(() => {});
-}
 export function ProjectForm({ closing = false }: { closing?: boolean }) {
   const [step, setStep] = useState(1),
     [requirement, setRequirement] = useState(""),
@@ -26,11 +24,20 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
     [placeholder, setPlaceholder] = useState(0),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
-  const started = useRef(Date.now()),
+  const [reference, setReference] = useState("");
+  const [details, setDetails] = useState({
+    name: "",
+    contact: "",
+    company: "",
+  });
+  const submissionKey = useRef("");
+  const started = useRef(0),
     title = useRef<HTMLHeadingElement>(null),
     touched = useRef(false);
   const id = closing ? "closing" : "hero";
+  const StepHeading = closing ? "h3" : "h2";
   useEffect(() => {
+    started.current = Date.now();
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = setInterval(
       () => setPlaceholder((p) => (p + 1) % examples.length),
@@ -38,7 +45,8 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
     );
     return () => clearInterval(timer);
   }, []);
-  function next() {
+  async function next() {
+    track("start_project", id, selectedProject());
     if (requirement.trim().length < 10) {
       setError(
         "A little more detail helps. Please write at least 10 characters.",
@@ -46,8 +54,15 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
       return;
     }
     setError("");
+    try {
+      await ensureAttribution();
+    } catch {
+      setError("We couldn’t start your enquiry. Please try again.");
+      return;
+    }
+    if (!submissionKey.current) submissionKey.current = crypto.randomUUID();
     setStep(2);
-    track("start_project");
+    track("requirement_completed", id, selectedProject());
   }
   useEffect(() => {
     if (step > 1) title.current?.focus();
@@ -57,8 +72,9 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
     setBusy(true);
     setError("");
     const form = new FormData(e.currentTarget);
-    const utm = new URLSearchParams(location.search);
     try {
+      await ensureAttribution();
+      const visitor = visitorContext();
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -71,10 +87,11 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
           website: form.get("website"),
           startedAt: started.current,
           sourcePage: location.pathname,
-          utmSource: utm.get("utm_source"),
-          utmMedium: utm.get("utm_medium"),
-          utmCampaign: utm.get("utm_campaign"),
-          referrer: document.referrer,
+          projectType: selectedProject(),
+          submissionKey: submissionKey.current,
+          visitorId: visitor.visitorId,
+          ctaLocation: id,
+          analyticsAllowed: analyticsAllowed(),
         }),
       });
       const data = await response.json();
@@ -83,7 +100,7 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
           data.error || "Something went wrong. Please try again.",
         );
       setStep(4);
-      track("requirement_submitted");
+      setReference(data.reference);
     } catch (err) {
       setError(
         err instanceof Error
@@ -111,16 +128,20 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
             maxLength={5000}
             value={requirement}
             onFocus={() => {
-              if (!touched.current) {
-                track("requirement_interaction");
+              void ensureAttribution().catch(() => {});
+            }}
+            onChange={(e) => {
+              setRequirement(e.target.value);
+              if (!touched.current && e.target.value.trim()) {
+                track("requirement_started", id, selectedProject());
                 touched.current = true;
               }
             }}
-            onChange={(e) => setRequirement(e.target.value)}
             placeholder={
               closing ? "Describe what you need…" : examples[placeholder]
             }
             aria-describedby={error ? `${id}-error` : undefined}
+            aria-invalid={!!error && step === 1}
           />
           <div className="input-bottom">
             <span className="input-hint">
@@ -141,9 +162,9 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
               ← Back
             </button>
           </div>
-          <h3 ref={title} tabIndex={-1}>
+          <StepHeading ref={title} tabIndex={-1}>
             What best describes this?
-          </h3>
+          </StepHeading>
           <p className="form-help">A starting point is all we need.</p>
           <div className="type-options">
             {requirementTypes.map((t) => (
@@ -184,9 +205,9 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
               ← Back
             </button>
           </div>
-          <h3 tabIndex={-1} ref={title}>
+          <StepHeading tabIndex={-1} ref={title}>
             How should we reach you?
-          </h3>
+          </StepHeading>
           <div className="contact-fields">
             <label htmlFor={`${id}-name`}>
               Your name
@@ -194,6 +215,10 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
                 id={`${id}-name`}
                 name="name"
                 autoComplete="name"
+                value={details.name}
+                onChange={(e) =>
+                  setDetails({ ...details, name: e.target.value })
+                }
                 maxLength={120}
                 required
               />
@@ -204,8 +229,13 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
                 id={`${id}-contact`}
                 name="contact"
                 autoComplete="email"
+                value={details.contact}
+                onChange={(e) =>
+                  setDetails({ ...details, contact: e.target.value })
+                }
                 maxLength={254}
-                placeholder="you@company.com or +971…"
+                placeholder="you@company.com or +country code…"
+                aria-describedby={error ? `${id}-error` : undefined}
                 required
               />
             </label>
@@ -215,6 +245,10 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
                 id={`${id}-company`}
                 name="company"
                 autoComplete="organization"
+                value={details.company}
+                onChange={(e) =>
+                  setDetails({ ...details, company: e.target.value })
+                }
                 maxLength={160}
               />
             </label>
@@ -238,20 +272,25 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
           </div>
         </form>
       ) : (
-        <div className="form-step success">
+        <div className="form-step success" role="status">
           <span className="success-icon">✓</span>
-          <h3 ref={title} tabIndex={-1}>
-            A good place to start.
-          </h3>
+          <StepHeading ref={title} tabIndex={-1}>
+            Your idea is with Khalq.
+          </StepHeading>
           <p>
-            Your requirement is with us. We’ll be in touch using the contact
-            details you shared.
+            We’ll review your requirement and identify the best way to build it.
           </p>
+          {reference && (
+            <p className="enquiry-reference">Reference: {reference}</p>
+          )}
           <button
             className="text-button"
             onClick={() => {
               setStep(1);
               setRequirement("");
+              setDetails({ name: "", contact: "", company: "" });
+              submissionKey.current = "";
+              touched.current = false;
               started.current = Date.now();
             }}
           >

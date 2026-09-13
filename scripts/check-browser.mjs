@@ -41,7 +41,7 @@ const submitted = page.waitForResponse((r) => r.url().endsWith("/api/leads"));
 await page.getByRole("button", { name: "Send My Requirement" }).click();
 const submission = await submitted;
 assert.equal(submission.status(), 201, await submission.text());
-await page.getByRole("heading", { name: "A good place to start." }).waitFor();
+await page.getByRole("heading", { name: "Your idea is with Khalq." }).waitFor();
 await page.screenshot({ path: "test-results/form-success.png" });
 for (const path of [
   "/solutions",
@@ -101,7 +101,7 @@ assert.ok(
   await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
 );
 await page.getByRole("button", { name: "Send My Requirement" }).click();
-await page.getByRole("heading", { name: "A good place to start." }).waitFor();
+await page.getByRole("heading", { name: "Your idea is with Khalq." }).waitFor();
 assert.deepEqual(errors, []);
 await browser.close();
 console.log(

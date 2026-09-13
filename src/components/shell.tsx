@@ -4,19 +4,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Brand, Arrow } from "./brand";
 import { navigation, contact } from "@/lib/content";
-import { track } from "./project-form";
+import {
+  track,
+  visitorContext,
+  ensureAttribution,
+} from "@/lib/client-tracking";
 export function InteractionAnalytics() {
   useEffect(() => {
+    visitorContext();
+    track("visit");
     function clicked(event: MouseEvent) {
       const target = event.target;
       if (!(target instanceof Element)) return;
       const link = target.closest("a");
       if (!link) return;
       const href = link.getAttribute("href") || "";
-      if (href.includes("#project")) track("start_project");
-      else if (href === "/products") track("product_interest");
+      if (href.startsWith("/")) void ensureAttribution().catch(() => {});
+      const location = link.closest("footer")
+        ? "footer"
+        : link.closest("header")
+          ? "navigation"
+          : "page";
+      if (href.includes("#project")) track("start_project", location);
+      else if (href === "/products") track("product_interest", location);
       else if (href.startsWith("mailto:") || href.startsWith("tel:"))
-        track("contact_conversion");
+        track("contact_clicked", location);
     }
     document.addEventListener("click", clicked);
     return () => document.removeEventListener("click", clicked);
@@ -72,7 +84,11 @@ export function Header() {
     </header>
   );
 }
-export function Footer() {
+export function Footer({
+  contactEmail = contact.email,
+}: {
+  contactEmail?: string;
+}) {
   return (
     <footer className="footer container">
       <div className="footer-top">
@@ -94,8 +110,8 @@ export function Footer() {
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} Khalq. All rights reserved.</span>
         <div>
-          {contact.email && (
-            <a href={`mailto:${contact.email}`}>{contact.email}</a>
+          {contactEmail && (
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
           )}
           {contact.socials.map((s) => (
             <a key={s.url} href={s.url}>

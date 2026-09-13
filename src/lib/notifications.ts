@@ -1,51 +1,57 @@
-import { db } from "./db.ts";
-export async function flushNotifications() {
-  const url = process.env.LEAD_NOTIFICATION_WEBHOOK;
-  if (!url) return { configured: false, sent: 0 };
-  if (!url.startsWith("https://") && process.env.NODE_ENV === "production")
-    throw new Error("Notification webhooks require HTTPS.");
-  const database = db();
-  let sent = 0;
-  const pending = database
-    .prepare(
-      "SELECT id,lead_id FROM notification_outbox WHERE status='pending' AND next_attempt<=? ORDER BY created_at LIMIT 20",
-    )
-    .all(Date.now()) as { id: string; lead_id: string }[];
-  for (const item of pending) {
-    // Lease each job to avoid simultaneous workers delivering the same notification.
-    const claim = database
-      .prepare(
-        "UPDATE notification_outbox SET next_attempt=?,attempts=attempts+1 WHERE id=? AND status='pending' AND next_attempt<=?",
-      )
-      .run(Date.now() + 60000, item.id, Date.now());
-    if (!claim.changes) continue;
-    const lead = database
-      .prepare("SELECT * FROM leads WHERE id=?")
-      .get(item.lead_id);
+import { database, type Database, type StoredLead } from "./db.ts";
+import { deliverEmail } from "./email.ts";
+import { emailProvider } from "./config.ts";
+import { log } from "./logger.ts";
+export async function flushNotifications(connection?: Database) {
+  const provider = emailProvider();
+  if (provider === "disabled") return { configured: false, sent: 0, failed: 0 };
+  const db = connection || (await database());
+  let sent = 0,
+    failed = 0;
+  const jobs = await db.query<{
+    id: string;
+    lead_id: string;
+    attempts: number;
+  }>(
+    "SELECT id,lead_id,attempts FROM notification_outbox WHERE status='pending' AND next_attempt<=$1 ORDER BY created_at LIMIT 20",
+    [Date.now()],
+  );
+  for (const job of jobs) {
+    const claimed = await db.query(
+      "UPDATE notification_outbox SET next_attempt=$1,attempts=attempts+1 WHERE id=$2 AND status='pending' AND next_attempt<=$3 RETURNING id",
+      [Date.now() + 120000, job.id, Date.now()],
+    );
+    if (!claimed.length) continue;
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Idempotency-Key": item.id,
-          ...(process.env.LEAD_NOTIFICATION_TOKEN
-            ? { Authorization: `Bearer ${process.env.LEAD_NOTIFICATION_TOKEN}` }
-            : {}),
-        },
-        body: JSON.stringify({ event: "project_enquiry.created", lead }),
-        signal: AbortSignal.timeout(8000),
-        redirect: "error",
-      });
-      if (!response.ok) throw new Error("Notification rejected");
-      database
-        .prepare("UPDATE notification_outbox SET status='sent' WHERE id=?")
-        .run(item.id);
+      const [lead] = await db.query<StoredLead>(
+        "SELECT * FROM leads WHERE id=$1",
+        [job.lead_id],
+      );
+      if (!lead) throw Error("Missing lead");
+      await deliverEmail(lead, job.id);
+      await db.query(
+        "UPDATE notification_outbox SET status='sent',last_error_code=NULL,delivered_at=$1 WHERE id=$2",
+        [new Date().toISOString(), job.id],
+      );
       sent++;
+      log("notification_sent", { jobId: job.id, provider });
     } catch {
-      database
-        .prepare("UPDATE notification_outbox SET next_attempt=? WHERE id=?")
-        .run(Date.now() + 300000, item.id);
+      failed++;
+      await db.query(
+        "UPDATE notification_outbox SET next_attempt=$1,last_error_code=$2 WHERE id=$3",
+        [
+          Date.now() +
+            Math.min(3600000, 60000 * 2 ** Math.min(job.attempts, 6)),
+          "delivery_failed",
+          job.id,
+        ],
+      );
+      log("notification_failed", {
+        jobId: job.id,
+        provider,
+        attempt: job.attempts + 1,
+      });
     }
   }
-  return { configured: true, sent };
+  return { configured: true, sent, failed };
 }

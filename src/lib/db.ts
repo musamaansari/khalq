@@ -1,81 +1,166 @@
-import { DatabaseSync } from "node:sqlite";
-import { mkdirSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
+import { resolve } from "node:path";
+import { openPostgres } from "./database/postgres.ts";
+import { migrate, migrationNames } from "./database/migrations.ts";
+import type { Database, Queryable, Row, SqlValue } from "./database/types.ts";
 import type { LeadInput } from "./validation.ts";
-let connection: DatabaseSync | undefined;
-export function db() {
-  if (connection) return connection;
-  const path = resolve(
-    /* turbopackIgnore: true */ process.env.DATABASE_PATH ||
-      "data/khalq.sqlite",
-  );
-  mkdirSync(dirname(path), { recursive: true });
-  connection = new DatabaseSync(path);
-  connection.exec(`
- PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;
- CREATE TABLE IF NOT EXISTS leads (
- id TEXT PRIMARY KEY,name TEXT NOT NULL,email TEXT NOT NULL,phone TEXT NOT NULL,company TEXT NOT NULL,
- requirement TEXT NOT NULL,requirement_type TEXT NOT NULL,source_page TEXT NOT NULL,
- utm_source TEXT NOT NULL,utm_medium TEXT NOT NULL,utm_campaign TEXT NOT NULL,referrer TEXT NOT NULL,
- status TEXT NOT NULL DEFAULT 'New' CHECK(status IN ('New','Reviewing','Contacted','Qualified','Proposal','Won','Lost')),
- created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')));
- CREATE TABLE IF NOT EXISTS notification_outbox (id TEXT PRIMARY KEY,lead_id TEXT NOT NULL REFERENCES leads(id),status TEXT NOT NULL DEFAULT 'pending',attempts INTEGER NOT NULL DEFAULT 0,next_attempt INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')));
- CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY,hits INTEGER NOT NULL,expires INTEGER NOT NULL);
- CREATE TABLE IF NOT EXISTS events (day TEXT NOT NULL,event TEXT NOT NULL,page TEXT NOT NULL,count INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(day,event,page));
- CREATE INDEX IF NOT EXISTS leads_status ON leads(status,created_at);
- CREATE INDEX IF NOT EXISTS notifications_pending ON notification_outbox(status,next_attempt);
- `);
-  return connection;
-}
-export function saveLead(lead: LeadInput) {
-  const database = db(),
-    id = randomUUID();
-  database.exec("BEGIN IMMEDIATE");
-  try {
-    database
-      .prepare(
-        "INSERT INTO leads(id,name,email,phone,company,requirement,requirement_type,source_page,utm_source,utm_medium,utm_campaign,referrer) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
-      )
-      .run(
-        id,
-        lead.name,
-        lead.email,
-        lead.phone,
-        lead.company,
-        lead.requirement,
-        lead.requirementType,
-        lead.sourcePage,
-        lead.utmSource,
-        lead.utmMedium,
-        lead.utmCampaign,
-        lead.referrer,
+import { isProduction } from "./config.ts";
+import { log } from "./logger.ts";
+export type { Database, Queryable };
+let active: Promise<Database> | undefined;
+export async function database(): Promise<Database> {
+  if (!active)
+    active = (async () => {
+      if (process.env.DATABASE_URL)
+        return openPostgres(process.env.DATABASE_URL);
+      if (isProduction())
+        throw new Error("Production database configuration unavailable");
+      const { openSqlite } = await import("./database/sqlite.ts");
+      const db = openSqlite(
+        resolve(
+          /* turbopackIgnore: true */ process.env.DATABASE_PATH ||
+            "data/khalq.sqlite",
+        ),
       );
-    database
-      .prepare("INSERT INTO notification_outbox(id,lead_id) VALUES(?,?)")
-      .run(randomUUID(), id);
-    database.exec("COMMIT");
-    return id;
-  } catch (error) {
-    database.exec("ROLLBACK");
-    throw error;
+      await migrate(db);
+      return db;
+    })().catch((error) => {
+      active = undefined;
+      log("database_error");
+      throw error;
+    });
+  return active;
+}
+export async function closeDatabase() {
+  if (active) {
+    const connection = await active;
+    active = undefined;
+    await connection.close();
   }
 }
-export function allowRequest(key: string, limit: number, windowMs = 3600000) {
-  const database = db(),
-    now = Date.now();
-  database.prepare("DELETE FROM rate_limits WHERE expires <= ?").run(now);
-  const result = database
-    .prepare(
-      "INSERT INTO rate_limits(key,hits,expires) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET hits=hits+1 RETURNING hits",
-    )
-    .get(key, now + windowMs) as { hits: number };
-  return result.hits <= limit;
+export type StoredLead = Row & {
+  id: string;
+  reference: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  requirement: string;
+  requirement_type: string;
+  project_type: string;
+  source_page: string;
+  landing_page: string;
+  referrer: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_term: string;
+  utm_content: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+};
+export type AnalyticsEvent = {
+  id: string;
+  visitorId: string;
+  event: string;
+  page: string;
+  ctaLocation: string;
+  projectType: string;
+};
+export async function recordEvent(
+  event: AnalyticsEvent,
+  connection?: Queryable,
+) {
+  const tx = connection || (await database());
+  await tx.query(
+    "INSERT INTO analytics_events(id,visitor_id,event,page,cta_location,project_type,created_at) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(id) DO NOTHING",
+    [
+      event.id,
+      event.visitorId,
+      event.event,
+      event.page,
+      event.ctaLocation,
+      event.projectType,
+      new Date().toISOString(),
+    ],
+  );
 }
-export function recordEvent(event: string, page: string) {
-  db()
-    .prepare(
-      "INSERT INTO events(day,event,page,count) VALUES(date('now'),?,?,1) ON CONFLICT(day,event,page) DO UPDATE SET count=count+1",
-    )
-    .run(event, page);
+export async function saveLead(
+  lead: LeadInput,
+  options: {
+    database?: Database;
+    abuseHash?: string;
+    event?: AnalyticsEvent;
+  } = {},
+) {
+  const db = options.database || (await database());
+  return db.transaction(async (tx) => {
+    const id = randomUUID(),
+      reference = "KHQ-" + randomBytes(6).toString("hex").toUpperCase(),
+      now = new Date().toISOString();
+    const values: SqlValue[] = [
+      id,
+      reference,
+      lead.submissionKey || null,
+      lead.name,
+      lead.email,
+      lead.phone,
+      lead.company,
+      lead.requirement,
+      lead.requirementType,
+      lead.projectType,
+      lead.sourcePage,
+      lead.landingPage,
+      lead.referrer,
+      lead.utmSource,
+      lead.utmMedium,
+      lead.utmCampaign,
+      lead.utmTerm,
+      lead.utmContent,
+      options.abuseHash || null,
+      options.abuseHash ? Date.now() + 86400000 : null,
+      now,
+      now,
+    ];
+    const rows = await tx.query<{ reference: string }>(
+      "INSERT INTO leads(id,reference,submission_key,name,email,phone,company,requirement,requirement_type,project_type,source_page,landing_page,referrer,utm_source,utm_medium,utm_campaign,utm_term,utm_content,abuse_hash,abuse_expires,created_at,updated_at) VALUES(" +
+        values.map((_, i) => "$" + (i + 1)).join(",") +
+        ") ON CONFLICT(submission_key) DO NOTHING RETURNING reference",
+      values,
+    );
+    if (!rows.length) {
+      const existing = await tx.query<{ reference: string }>(
+        "SELECT reference FROM leads WHERE submission_key=$1",
+        [lead.submissionKey],
+      );
+      return { reference: existing[0].reference, duplicate: true };
+    }
+    await tx.query(
+      "INSERT INTO notification_outbox(id,lead_id,created_at) VALUES($1,$2,$3)",
+      [randomUUID(), id, now],
+    );
+    if (options.event)
+      await recordEvent({ ...options.event, event: "lead_submitted", id }, tx);
+    return { reference, duplicate: false };
+  });
+}
+export async function allowRequest(
+  key: string,
+  limit: number,
+  windowMs = 3600000,
+  connection?: Database,
+) {
+  const db = connection || (await database()),
+    now = Date.now();
+  const [row] = await db.query<{ hits: number }>(
+    "INSERT INTO rate_limits(key,hits,expires) VALUES($1,1,$2) ON CONFLICT(key) DO UPDATE SET hits=CASE WHEN rate_limits.expires<=$3 THEN 1 ELSE rate_limits.hits+1 END,expires=CASE WHEN rate_limits.expires<=$3 THEN $2 ELSE rate_limits.expires END RETURNING hits",
+    [key, now + windowMs, now],
+  );
+  return row.hits <= limit;
+}
+export async function databaseHealthy(connection?: Database) {
+  const db = connection || (await database());
+  const rows = await db.query("SELECT name FROM schema_migrations");
+  return migrationNames.every((name) => rows.some((row) => row.name === name));
 }

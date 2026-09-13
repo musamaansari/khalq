@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { appUrl } from "@/lib/config";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: "*", allow: "/", disallow: "/api/" },
-    sitemap: `${process.env.SITE_URL || "https://khalq.io"}/sitemap.xml`,
+    sitemap: `${appUrl()}/sitemap.xml`,
   };
 }

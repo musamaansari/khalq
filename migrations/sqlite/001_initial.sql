@@ -1,0 +1,5 @@
+-- Matches V1 exactly so existing local databases are adopted without losing records.
+CREATE TABLE IF NOT EXISTS leads (id TEXT PRIMARY KEY,name TEXT NOT NULL,email TEXT NOT NULL,phone TEXT NOT NULL,company TEXT NOT NULL,requirement TEXT NOT NULL,requirement_type TEXT NOT NULL,source_page TEXT NOT NULL,utm_source TEXT NOT NULL,utm_medium TEXT NOT NULL,utm_campaign TEXT NOT NULL,referrer TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'New' CHECK(status IN ('New','Reviewing','Contacted','Qualified','Proposal','Won','Lost')),created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')));
+CREATE TABLE IF NOT EXISTS notification_outbox(id TEXT PRIMARY KEY,lead_id TEXT NOT NULL REFERENCES leads(id),status TEXT NOT NULL DEFAULT 'pending',attempts INTEGER NOT NULL DEFAULT 0,next_attempt INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')));
+CREATE TABLE IF NOT EXISTS rate_limits(key TEXT PRIMARY KEY,hits INTEGER NOT NULL,expires INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS events(day TEXT NOT NULL,event TEXT NOT NULL,page TEXT NOT NULL,count INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(day,event,page));

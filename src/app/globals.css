@@ -214,7 +214,7 @@ p {
   font-weight: 500;
   letter-spacing: 1.7px;
   line-height: 1.5;
-  color: #6d756f;
+  color: #626d66;
 }
 .hero-kicker {
   display: flex;
@@ -300,7 +300,7 @@ p {
   outline: none;
 }
 .project-box textarea::placeholder {
-  color: #717a75;
+  color: #626d66;
 }
 .input-bottom {
   display: flex;
@@ -312,7 +312,7 @@ p {
 }
 .input-hint {
   font-size: 10px;
-  color: #717a75;
+  color: #626d66;
   line-height: 1.5;
 }
 .input-hint > span {
@@ -326,7 +326,7 @@ p {
   color: #656e6a;
 }
 .form-caption span {
-  color: #717a75;
+  color: #626d66;
 }
 .category-shortcuts {
   display: flex;
@@ -358,7 +358,7 @@ p {
   border-top: 1px solid var(--line);
   font-size: 8px;
   letter-spacing: 1.25px;
-  color: #8a918a;
+  color: #626d66;
 }
 .hero-bottom a {
   display: flex;
@@ -429,7 +429,7 @@ p {
 }
 .service-number {
   font-size: 9px;
-  color: #9a9f98;
+  color: #626d66;
   font-family: var(--heading);
 }
 .solution h3 {
@@ -548,7 +548,7 @@ p {
 .status {
   font-size: 8px;
   letter-spacing: 1.5px;
-  color: #7c887f;
+  color: #626d66;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -657,7 +657,7 @@ p {
   display: flex;
   justify-content: space-between;
   font-size: 9px;
-  color: #8b938d;
+  color: #626d66;
   gap: 22px;
 }
 .footer-bottom > div {
@@ -782,12 +782,13 @@ p {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #89928b;
+  color: #626d66;
   font-size: 9px;
   letter-spacing: 1px;
   margin-bottom: 18px;
 }
 .text-button {
+  min-height: 32px;
   background: none;
   padding: 5px 0;
   font-size: 11px;
@@ -796,7 +797,8 @@ p {
 .text-button:hover {
   color: var(--blue);
 }
-.form-step h3 {
+.form-step h3,
+.form-step h2 {
   font-size: 25px;
   letter-spacing: -0.9px;
   outline: none;
@@ -842,7 +844,7 @@ p {
   color: #545d58;
 }
 .contact-fields label span {
-  color: #8c958e;
+  color: #626d66;
 }
 .contact-fields input {
   display: block;
@@ -861,9 +863,11 @@ p {
 .privacy-note {
   font-size: 9px;
   line-height: 1.7;
-  color: #8b938d;
+  color: #626d66;
 }
 .privacy-note a {
+  display: inline-block;
+  padding-block: 4px;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -995,6 +999,8 @@ p {
     gap: 14px;
   }
   .menu-toggle {
+    min-width: 32px;
+    min-height: 44px;
     display: block;
     font-size: 19px;
     padding: 8px 0 8px 5px;
@@ -1349,7 +1355,8 @@ p {
   .contact-fields input {
     font-size: 16px;
   }
-  .form-step h3 {
+  .form-step h3,
+  .form-step h2 {
     font-size: 22px;
   }
   .type-options button {

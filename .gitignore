@@ -6,3 +6,10 @@ node_modules/
 data/
 *.tsbuildinfo
 test-results/
+coverage/
+*.log
+*.sqlite*
+*.db
+*.dump
+*.backup
+.railway/

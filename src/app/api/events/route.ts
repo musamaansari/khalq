@@ -1,36 +1,52 @@
 import { NextResponse } from "next/server";
-import { allowRequest, recordEvent } from "@/lib/db";
-import { sameOrigin, rateKey, readBody } from "@/lib/request";
-const allowed = new Set([
-  "requirement_interaction",
-  "start_project",
-  "requirement_submitted",
-  "product_interest",
-  "contact_conversion",
-]);
+import { recordEvent } from "@/lib/db";
+import { sameOrigin, readBody, permitted, visitorHash } from "@/lib/request";
+import {
+  events,
+  pages,
+  projectTypes,
+  ctaLocations,
+  uuidPattern,
+} from "@/lib/tracking";
+import { log } from "@/lib/logger";
 export async function POST(request: Request) {
-  if (!sameOrigin(request)) return new NextResponse(null, { status: 403 });
-  if (request.headers.get("dnt") === "1")
-    return new NextResponse(null, { status: 204 });
   try {
-    if (!allowRequest(rateKey(request, "events"), 120, 60000))
+    if (!sameOrigin(request)) return new NextResponse(null, { status: 403 });
+    if (
+      process.env.ANALYTICS_ENABLED === "false" ||
+      request.headers.get("dnt") === "1" ||
+      request.headers.get("sec-gpc") === "1"
+    )
+      return new NextResponse(null, { status: 204 });
+    if (!(await permitted(request, "events")))
       return new NextResponse(null, { status: 429 });
     const data = await readBody(request);
     if (
-      !allowed.has(data.event) ||
-      ![
-        "/",
-        "/solutions",
-        "/products",
-        "/about",
-        "/privacy",
-        "/terms",
-      ].includes(data.page)
+      !data ||
+      typeof data !== "object" ||
+      !events.includes(data.event) ||
+      data.event === "lead_submitted" ||
+      !pages.includes(data.page) ||
+      !ctaLocations.includes(data.ctaLocation) ||
+      !projectTypes.includes(data.projectType) ||
+      !uuidPattern.test(data.id) ||
+      !uuidPattern.test(data.visitorId)
     )
       return new NextResponse(null, { status: 400 });
-    recordEvent(data.event, data.page);
-    return new NextResponse(null, { status: 204 });
+    await recordEvent({
+      id: data.id,
+      visitorId: visitorHash(data.visitorId),
+      event: data.event,
+      page: data.page,
+      ctaLocation: data.ctaLocation,
+      projectType: data.projectType,
+    });
+    return new NextResponse(null, {
+      status: 204,
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch {
+    log("application_error");
     return new NextResponse(null, { status: 400 });
   }
 }

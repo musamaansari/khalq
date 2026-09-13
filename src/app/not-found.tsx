@@ -8,9 +8,9 @@ export default function NotFound() {
         <br />
         Plenty <span className="gradient-text">ahead.</span>
       </h1>
-      <p>This page may have moved, or hasn’t been created yet.</p>
+      <p>This page hasn’t been created yet.</p>
       <Link href="/" className="button">
-        Back to Khalq →
+        Go to Khalq →
       </Link>
     </main>
   );
