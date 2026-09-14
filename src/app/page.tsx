@@ -50,8 +50,8 @@ export default function Home() {
       <section id="solutions" className="section container">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">01 / WHAT WE HELP WITH</span>
-            <h2>Technology built around the need.</h2>
+            <span className="eyebrow">01 / WHERE TO FOCUS</span>
+            <h2>Three directions. One clear starting point.</h2>
           </div>
           <Link className="text-link" href="/use-cases">
             Explore use cases <Arrow />
@@ -62,9 +62,9 @@ export default function Home() {
       <section className="home-next">
         <div className="container home-next-inner">
           <div>
-            <span className="eyebrow">A CLEAR WAY FORWARD</span>
-            <h2>Start with the business problem.</h2>
-            <p>We’ll help shape the right product, system or improvement.</p>
+            <span className="eyebrow">FROM IDEA TO MOMENTUM</span>
+            <h2>Move the right opportunity forward.</h2>
+            <p>Choose a direction, or describe the ambition in your own words.</p>
           </div>
           <div className="home-next-links">
             <Link href="/solutions">

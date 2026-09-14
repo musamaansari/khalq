@@ -16,69 +16,69 @@ export const services = [
   {
     slug: "software",
     name: "Software",
-    description: "Business systems designed around real workflows.",
+    description: "Internal platforms for complex operations.",
     detail:
-      "Bring your operations into one place, with software that fits the way your team works.",
+      "Design secure dashboards, case-management tools and operational applications tailored to the structure of your organisation.",
     symbol: "▤",
   },
   {
     slug: "ai-automation",
     name: "AI & Automation",
-    description: "Intelligent tools that remove repetitive work.",
+    description: "Applied intelligence for high-volume tasks.",
     detail:
-      "Give your team time back. Connect repetitive tasks, make information easier to find, and put AI to practical use.",
+      "Introduce assistants, document processing and automated task flows where they can save measurable time.",
     symbol: "✳",
   },
   {
     slug: "saas",
     name: "SaaS",
-    description: "Scalable products built for recurring use.",
+    description: "Multi-tenant platforms ready for recurring use.",
     detail:
-      "Take a product from the first useful version to a platform your customers can rely on.",
+      "Engineer accounts, subscriptions, administration and the product foundations needed to serve a growing customer base.",
     symbol: "◫",
   },
   {
     slug: "web-mobile",
     name: "Web & Mobile",
-    description: "Digital experiences designed around users.",
+    description: "Customer-facing experiences across every screen.",
     detail:
-      "Build responsive web applications and mobile experiences that make everyday tasks feel simple.",
+      "Deliver responsive portals, commerce journeys and mobile applications with clear interaction design.",
     symbol: "▯",
   },
   {
     slug: "integrations",
     name: "Integrations",
-    description: "Connect the tools your business already depends on.",
+    description: "Reliable connections across your technology stack.",
     detail:
-      "Let your systems talk to each other. Connect APIs, share data, and reduce work between tools.",
+      "Build API connections, synchronisation services and data pipelines that keep critical systems aligned.",
     symbol: "⇄",
   },
   {
     slug: "custom-solutions",
     name: "Custom Solutions",
-    description: "When an off-the-shelf solution isn’t enough.",
+    description: "Cross-disciplinary builds for unusual requirements.",
     detail:
-      "Create custom business systems around a challenge that existing tools don’t quite solve.",
+      "Combine product strategy, experience design and engineering when the requirement does not fit a standard category.",
     symbol: "⌘",
   },
 ];
 export const homeFocus = [
   {
-    label: "RUN BETTER",
-    title: "Improve how work gets done.",
-    text: "Replace scattered steps with clear software and practical automation.",
+    label: "RUN THE BUSINESS",
+    title: "Give operations one reliable rhythm.",
+    text: "Create clarity around ownership, progress and the work that matters next.",
     href: "/use-cases#operations",
   },
   {
-    label: "CONNECT THE BUSINESS",
-    title: "Make your systems work together.",
-    text: "Connect tools, data and teams so information moves without repeated effort.",
+    label: "JOIN THE DOTS",
+    title: "Let information move without chasing it.",
+    text: "Reduce handovers and give every team a consistent view of the facts.",
     href: "/use-cases#connected-systems",
   },
   {
-    label: "CREATE WHAT’S NEXT",
-    title: "Turn an idea into a useful product.",
-    text: "Shape, build and improve a digital product around a real customer need.",
+    label: "ENTER THE MARKET",
+    title: "Test a digital proposition with customers.",
+    text: "Move from early conviction to evidence, adoption and a credible path to growth.",
     href: "/use-cases#new-products",
   },
 ];
@@ -86,152 +86,142 @@ export const useCases = [
   {
     slug: "operations",
     solution: "custom-solutions",
-    title: "Bring operations into one place.",
+    title: "Work disappears between handovers.",
     problem:
-      "Important work is spread across spreadsheets, inboxes, messages and disconnected tools.",
+      "Requests arrive through several channels, responsibility is unclear and leaders cannot see progress without chasing updates.",
     response:
-      "Create one practical system for the workflow, information and decisions your team handles every day.",
-    outcomes: [
-      "Clear ownership",
-      "Less repeated entry",
-      "A reliable view of work",
-    ],
+      "Establish a shared operating view with defined stages, ownership and the information each person needs to move work forward.",
+    outcomes: ["Visible workload", "Faster handovers", "Fewer missed actions"],
   },
   {
     slug: "automation",
     solution: "ai-automation",
-    title: "Remove repetitive work.",
+    title: "Routine admin consumes skilled time.",
     problem:
-      "People spend valuable time copying information, preparing routine updates or following the same steps manually.",
+      "Teams repeatedly prepare the same documents, summaries or data updates instead of focusing on higher-value work.",
     response:
-      "Automate the predictable parts while keeping people in control of the decisions that need judgment.",
-    outcomes: [
-      "Faster turnaround",
-      "Fewer avoidable errors",
-      "More time for useful work",
-    ],
+      "Identify the stable rules, automate those steps and keep review points around exceptions or judgment.",
+    outcomes: ["Shorter queues", "Consistent execution", "More expert capacity"],
   },
   {
     slug: "connected-systems",
     solution: "integrations",
-    title: "Connect systems and data.",
+    title: "Different systems tell different stories.",
     problem:
-      "Your business tools work separately, creating gaps, delays and conflicting versions of the same information.",
+      "Records fall out of sync, teams reconcile figures by hand and important changes do not reach every place they should.",
     response:
-      "Build secure integrations and shared workflows that move the right data to the right place.",
-    outcomes: [
-      "Consistent information",
-      "Smoother handovers",
-      "Less manual coordination",
-    ],
+      "Define the source of truth and create dependable flows that carry updates across the organisation.",
+    outcomes: ["Trusted records", "Timely updates", "Less reconciliation"],
   },
   {
     slug: "customer-experience",
     solution: "web-mobile",
-    title: "Make customer interactions simpler.",
+    title: "Customers wait for tasks they could complete.",
     problem:
-      "Customers rely on calls, emails or slow internal steps for tasks they should be able to complete easily.",
+      "Simple requests depend on office hours, follow-up calls or internal assistance, adding delay for customers and staff.",
     response:
-      "Create a focused portal, web application or mobile experience around the customer journey.",
-    outcomes: [
-      "Easier self-service",
-      "Clearer communication",
-      "A more useful experience",
-    ],
+      "Redesign the journey around clear self-service, transparent status and support at the moments that genuinely need it.",
+    outcomes: ["Anytime access", "Lower service demand", "Greater confidence"],
   },
   {
     slug: "new-products",
     solution: "saas",
-    title: "Launch a new digital product.",
+    title: "A promising idea needs commercial proof.",
     problem:
-      "You have a strong idea, but need to define the first useful version and make the right technical choices.",
+      "The opportunity feels compelling, but the audience, proposition and release priorities still contain important assumptions.",
     response:
-      "Turn the idea into a clear product scope, build the essential experience and create a foundation that can evolve.",
-    outcomes: [
-      "A focused first release",
-      "Real user learning",
-      "A scalable direction",
-    ],
+      "Translate the concept into a focused market test that can reveal demand before the investment grows.",
+    outcomes: ["Sharper positioning", "Evidence from users", "Informed investment"],
   },
   {
     slug: "existing-software",
     solution: "software",
-    title: "Improve software that no longer fits.",
+    title: "A legacy system is limiting the next stage.",
     problem:
-      "An existing system is difficult to use, expensive to maintain or holding back the way the business now operates.",
+      "The technology is costly to change, difficult to navigate or unable to support the organisation’s current direction.",
     response:
-      "Simplify, integrate or rebuild the parts that create the most friction without changing everything at once.",
-    outcomes: [
-      "Lower operational friction",
-      "Better adoption",
-      "A practical path forward",
-    ],
+      "Assess the constraints, protect what still works and modernise in stages that control risk and disruption.",
+    outcomes: ["Reduced technical risk", "Easier change", "A managed transition"],
   },
 ];
 export const engagementTypes = [
   {
-    title: "A new product",
-    text: "Define and build the first useful version of a SaaS platform, portal, web application or mobile experience.",
+    title: "Commission a platform",
+    text: "Create a complete digital asset for customers, partners or employees, from product definition through release.",
   },
   {
-    title: "A business system",
-    text: "Create software around a workflow that generic tools, spreadsheets or manual processes cannot handle well.",
+    title: "Equip an operation",
+    text: "Give a team purpose-built infrastructure for specialised work that generic software cannot support well.",
   },
   {
-    title: "An improvement",
-    text: "Automate a bottleneck, connect existing tools or modernize the part of a system causing the most friction.",
+    title: "Extend your stack",
+    text: "Add a targeted layer of intelligence, connectivity or modern experience to technology you already own.",
   },
 ];
 export const process = [
   {
-    name: "Tell us",
-    text: "Share the idea, problem or process you want to improve.",
+    name: "Frame",
+    text: "Establish the decision to be made.",
     detail:
-      "We begin with the business context: what is happening now, who is affected and what a better outcome would look like.",
-    outputs: ["Business goal", "Current workflow", "Success measure"],
+      "We gather commercial context, user realities, constraints and evidence until the objective and boundaries are explicit.",
+    outputs: ["Opportunity statement", "Decision criteria", "Known constraints"],
   },
   {
-    name: "We understand",
-    text: "We identify the right technology and approach.",
+    name: "Shape",
+    text: "Turn context into a viable route.",
     detail:
-      "We turn the problem into a clear, prioritized plan. Technology follows the need rather than leading the conversation.",
-    outputs: ["Focused scope", "Recommended approach", "Delivery plan"],
+      "We map journeys, test assumptions and define the smallest coherent release before engineering effort expands.",
+    outputs: ["Experience direction", "Release scope", "Technical blueprint"],
   },
   {
-    name: "We build",
-    text: "We design, develop and deliver the solution.",
+    name: "Deliver",
+    text: "Move from plans to working software.",
     detail:
-      "We create the experience and the system together, sharing useful progress early so decisions stay grounded in the real product.",
-    outputs: ["Working releases", "Regular feedback", "Quality checks"],
+      "Design, engineering and quality assurance progress together, with regular demonstrations and decisions recorded as they happen.",
+    outputs: ["Tested increments", "Decision log", "Release readiness"],
   },
   {
-    name: "You grow",
-    text: "Use, improve and scale it as your business evolves.",
+    name: "Evolve",
+    text: "Learn from operation after launch.",
     detail:
-      "After launch, we learn from real use, improve what matters and help the technology continue to fit the business.",
-    outputs: [
-      "Launch support",
-      "Measured improvements",
-      "A scalable foundation",
-    ],
+      "Usage, feedback and business change guide the backlog so investment continues where it produces the strongest return.",
+    outputs: ["Operational insight", "Prioritised backlog", "Growth roadmap"],
   },
 ];
-export const principles = [
+export const deliveryPrinciples = [
   {
-    title: "Start with the problem.",
-    text: "A clear understanding of the business need prevents unnecessary features and the wrong technical choices.",
+    title: "Decisions stay visible.",
+    text: "Trade-offs, assumptions and ownership are recorded so the team can move without ambiguity.",
   },
   {
-    title: "Make it useful early.",
-    text: "Working progress creates better feedback than long documents and keeps the project focused on real value.",
+    title: "Scope earns its place.",
+    text: "Every feature must support the agreed outcome or wait for a later release.",
   },
   {
-    title: "Design for adoption.",
-    text: "The right solution should feel clear to the people who use it and fit naturally into the way work happens.",
+    title: "Feedback has a cadence.",
+    text: "Regular reviews replace late surprises and keep stakeholders close to the product.",
   },
   {
-    title: "Build for change.",
-    text: "Businesses evolve. The product should be able to improve without becoming fragile or unnecessarily complex.",
+    title: "Release is a beginning.",
+    text: "Launch creates evidence; evidence guides what deserves attention next.",
+  },
+];
+export const aboutValues = [
+  {
+    title: "Business fluency.",
+    text: "We listen for commercial context, operational detail and the human reality behind the brief.",
+  },
+  {
+    title: "Independent judgment.",
+    text: "We recommend the smallest sensible route, even when that means building less.",
+  },
+  {
+    title: "Craft with purpose.",
+    text: "Design and engineering choices earn their place by making the experience clearer, faster or more dependable.",
+  },
+  {
+    title: "Long-term responsibility.",
+    text: "We consider ownership, maintainability and future change before the first release.",
   },
 ];
 export type Product = {

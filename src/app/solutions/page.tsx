@@ -3,7 +3,7 @@ import { engagementTypes } from "@/lib/content";
 export const metadata = {
   title: "Solutions",
   description:
-    "Custom software, AI solutions, business automation, SaaS development, web and mobile applications, and integrations built around your business.",
+    "Explore Khalq’s capabilities across internal platforms, applied AI, SaaS, customer experiences, integrations and bespoke digital systems.",
   alternates: { canonical: "/solutions" },
 };
 export default function Solutions() {
@@ -12,14 +12,13 @@ export default function Solutions() {
       <section className="container page-intro">
         <span className="eyebrow">WHAT WE BUILD</span>
         <h1>
-          Real problems.
+          Choose the right
           <br />
-          <span className="gradient-text">Useful technology.</span>
+          <span className="gradient-text">digital capability.</span>
         </h1>
         <p>
-          You know your business. We bring the technology.
-          <br />
-          Together, we build what you need.
+          Khalq assembles product design, engineering and systems expertise
+          around the type of asset your organisation needs to own.
         </p>
       </section>
       <section className="container page-solutions">
@@ -28,11 +27,11 @@ export default function Solutions() {
       <section className="content-band">
         <div className="container content-band-inner">
           <div className="content-band-heading">
-            <span className="eyebrow">WAYS TO BEGIN</span>
-            <h2>Start where the need is clearest.</h2>
+            <span className="eyebrow">ENGAGEMENT SHAPES</span>
+            <h2>Three ways to commission the work.</h2>
             <p>
-              You do not need a finished specification. A business problem,
-              opportunity or early idea is enough to begin.
+              The right structure depends on whether you are creating a new
+              asset, enabling a team or adding to an existing estate.
             </p>
           </div>
           <div className="content-list">
@@ -48,7 +47,15 @@ export default function Solutions() {
           </div>
         </div>
       </section>
-      <Closing />
+      <Closing
+        eyebrow="CHOOSE THE RIGHT CAPABILITY"
+        title={["Know what needs", "to be commissioned?"]}
+        description="Share the desired outcome and we’ll recommend the most suitable technical route."
+        formQuestion="What capability are you looking for?"
+        formPlaceholder="Describe the asset or capability…"
+        formHint="A short brief is enough to identify the right discipline."
+        formButtonLabel="Discuss the Brief"
+      />
     </main>
   );
 }

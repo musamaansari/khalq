@@ -17,11 +17,25 @@ const examples = [
   "Our business struggles with…",
   "I have an idea for…",
 ];
-export function ProjectForm({ closing = false }: { closing?: boolean }) {
+type ProjectFormProps = {
+  closing?: boolean;
+  question?: string;
+  placeholder?: string;
+  hint?: string;
+  buttonLabel?: string;
+};
+
+export function ProjectForm({
+  closing = false,
+  question,
+  placeholder,
+  hint,
+  buttonLabel,
+}: ProjectFormProps) {
   const [step, setStep] = useState(1),
     [requirement, setRequirement] = useState(""),
     [kind, setKind] = useState("Not sure"),
-    [placeholder, setPlaceholder] = useState(0),
+    [placeholderIndex, setPlaceholder] = useState(0),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const [reference, setReference] = useState("");
@@ -116,9 +130,10 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
       {step === 1 ? (
         <>
           <label className="form-question" htmlFor={`${id}-requirement`}>
-            {closing
-              ? "A better way starts here."
-              : "What do you want to build?"}
+            {question ??
+              (closing
+                ? "A better way starts here."
+                : "What do you want to build?")}
             <span className="form-spark" aria-hidden="true">
               ✳
             </span>
@@ -138,18 +153,20 @@ export function ProjectForm({ closing = false }: { closing?: boolean }) {
               }
             }}
             placeholder={
-              closing ? "Describe what you need…" : examples[placeholder]
+              closing
+                ? (placeholder ?? "Describe what you need…")
+                : examples[placeholderIndex]
             }
             aria-describedby={error ? `${id}-error` : undefined}
             aria-invalid={!!error && step === 1}
           />
           <div className="input-bottom">
             <span className="input-hint">
-              <span aria-hidden="true">↳</span> Big idea or small problem. Start
-              anywhere.
+              <span aria-hidden="true">↳</span>{" "}
+              {hint ?? "Big idea or small problem. Start anywhere."}
             </span>
             <button className="button" onClick={next}>
-              {closing ? "Let’s Build It" : "Start a Project"}
+              {closing ? (buttonLabel ?? "Let’s Build It") : "Start a Project"}
               <Arrow />
             </button>
           </div>

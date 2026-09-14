@@ -6,7 +6,7 @@ import { useCases } from "@/lib/content";
 export const metadata = {
   title: "Use Cases",
   description:
-    "Practical ways Khalq uses software, AI, automation and integrations to solve operational problems and create digital products.",
+    "Recognise the operational signals that point to a digital opportunity, from broken handovers and routine admin to legacy constraints.",
   alternates: { canonical: "/use-cases" },
 };
 
@@ -14,15 +14,15 @@ export default function UseCases() {
   return (
     <main id="main">
       <section className="container page-intro">
-        <span className="eyebrow">WHERE TECHNOLOGY CAN HELP</span>
+        <span className="eyebrow">WHEN TO CALL KHALQ</span>
         <h1>
-          Start with the problem.
+          Recognise the friction.
           <br />
-          <span className="gradient-text">Build what fits.</span>
+          <span className="gradient-text">See the opportunity.</span>
         </h1>
         <p>
-          The best starting point is often a process that takes too long, a
-          system that no longer works, or an opportunity worth creating.
+          These situations signal that a digital intervention could change the
+          economics, pace or quality of how the organisation performs.
         </p>
       </section>
       <section className="container use-case-list">
@@ -45,7 +45,15 @@ export default function UseCases() {
           </article>
         ))}
       </section>
-      <Closing />
+      <Closing
+        eyebrow="TURN FRICTION INTO A BRIEF"
+        title={["Recognise one of", "these situations?"]}
+        description="Describe what is happening today and we’ll map the opportunity behind it."
+        formQuestion="Where is the friction showing up?"
+        formPlaceholder="Explain what happens today…"
+        formHint="Symptoms, delays and workarounds are useful clues."
+        formButtonLabel="Map the Opportunity"
+      />
     </main>
   );
 }

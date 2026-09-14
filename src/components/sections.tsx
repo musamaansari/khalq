@@ -62,10 +62,13 @@ export function ProductsBlock({ overview = true }: { overview?: boolean }) {
       </div>
       <div>
         <span className="status">
-          <span /> IN THE MAKING
+          <span /> EARLY-STAGE VALIDATION
         </span>
-        <h3>Products are taking shape.</h3>
-        <p>Built from real needs. Made to be useful.</p>
+        <h3>The first concepts are under development.</h3>
+        <p>
+          We are testing demand and refining the proposition before revealing
+          what comes next.
+        </p>
       </div>
       {overview && (
         <Link
@@ -97,24 +100,44 @@ export function HomeFocus() {
     </div>
   );
 }
-export function Closing() {
+type ClosingProps = {
+  eyebrow: string;
+  title: [string, string];
+  description: string;
+  formQuestion: string;
+  formPlaceholder: string;
+  formHint: string;
+  formButtonLabel: string;
+};
+
+export function Closing({
+  eyebrow,
+  title,
+  description,
+  formQuestion,
+  formPlaceholder,
+  formHint,
+  formButtonLabel,
+}: ClosingProps) {
   return (
     <section className="closing" id="contact">
       <div className="container closing-inner">
         <div>
-          <span className="eyebrow">LET’S MAKE SOMETHING USEFUL</span>
+          <span className="eyebrow">{eyebrow}</span>
           <h2>
-            What’s slowing
+            {title[0]}
             <br />
-            your business down?
+            {title[1]}
           </h2>
-          <p>
-            Tell us the problem.
-            <br />
-            There may be a better way to build it.
-          </p>
+          <p>{description}</p>
         </div>
-        <ProjectForm closing />
+        <ProjectForm
+          closing
+          question={formQuestion}
+          placeholder={formPlaceholder}
+          hint={formHint}
+          buttonLabel={formButtonLabel}
+        />
       </div>
     </section>
   );
