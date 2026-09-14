@@ -1,10 +1,10 @@
 import { Closing } from "@/components/sections";
-import { principles, process } from "@/lib/content";
+import { deliveryPrinciples, process } from "@/lib/content";
 
 export const metadata = {
   title: "Process",
   description:
-    "A clear, practical process for understanding, designing, building and improving useful technology with Khalq.",
+    "Discover Khalq’s four-stage delivery method for framing decisions, shaping scope, releasing software and guiding post-launch evolution.",
   alternates: { canonical: "/process" },
 };
 
@@ -14,13 +14,13 @@ export default function Process() {
       <section className="container page-intro">
         <span className="eyebrow">HOW WE WORK</span>
         <h1>
-          A clear path
+          From first conversation
           <br />
-          <span className="gradient-text">from need to useful.</span>
+          <span className="gradient-text">to confident release.</span>
         </h1>
         <p>
-          No complicated starting point. We begin with your business, make the
-          important decisions clear and build in useful steps.
+          A visible sequence of decisions keeps scope, investment and
+          expectations aligned from discovery through operation.
         </p>
       </section>
       <section className="container process-list">
@@ -45,11 +45,11 @@ export default function Process() {
           <div className="section-heading">
             <div>
               <span className="eyebrow">THROUGHOUT THE WORK</span>
-              <h2>Simple principles. Better decisions.</h2>
+              <h2>The disciplines that protect delivery.</h2>
             </div>
           </div>
           <div className="principles-grid compact">
-            {principles.map((principle) => (
+            {deliveryPrinciples.map((principle) => (
               <article key={principle.title}>
                 <h3>{principle.title}</h3>
                 <p>{principle.text}</p>
@@ -58,7 +58,15 @@ export default function Process() {
           </div>
         </div>
       </section>
-      <Closing />
+      <Closing
+        eyebrow="BEGIN WITH CONTEXT"
+        title={["Ready for the", "first conversation?"]}
+        description="Bring the background, constraints and goal. Together, we’ll define the next decision."
+        formQuestion="What context should we understand first?"
+        formPlaceholder="Share the background and constraints…"
+        formHint="Context now prevents false assumptions later."
+        formButtonLabel="Begin the Conversation"
+      />
     </main>
   );
 }
