@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { ProjectForm } from "@/components/project-form";
-import { SolutionsGrid, ProductsBlock, Closing } from "@/components/sections";
+import { HomeFocus } from "@/components/sections";
 import { Arrow } from "@/components/brand";
-import { process } from "@/lib/content";
 export const metadata = { alternates: { canonical: "/" } };
 export default function Home() {
   return (
@@ -31,26 +30,12 @@ export default function Home() {
           </div>
           <div className="category-shortcuts">
             {[
-              "Software",
-              "AI & Automation",
-              "SaaS",
-              "Web & Mobile",
-              "Integrations",
-            ].map((x, i) => (
-              <Link
-                href={
-                  "/solutions#" +
-                  [
-                    "software",
-                    "ai-automation",
-                    "saas",
-                    "web-mobile",
-                    "integrations",
-                  ][i]
-                }
-                key={x}
-              >
-                {x}
+              ["Software", "software"],
+              ["AI & Automation", "ai-automation"],
+              ["Digital Products", "saas"],
+            ].map((x) => (
+              <Link href={`/solutions#${x[1]}`} key={x[1]}>
+                {x[0]}
               </Link>
             ))}
           </div>
@@ -65,79 +50,35 @@ export default function Home() {
       <section id="solutions" className="section container">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">01 / WHAT WE BUILD</span>
-            <h2>From problem to product.</h2>
+            <span className="eyebrow">01 / WHAT WE HELP WITH</span>
+            <h2>Technology built around the need.</h2>
           </div>
-          <Link className="text-link" href="/solutions">
-            Explore solutions <Arrow />
+          <Link className="text-link" href="/use-cases">
+            Explore use cases <Arrow />
           </Link>
         </div>
-        <SolutionsGrid />
+        <HomeFocus />
       </section>
-      <section className="statement">
-        <div className="container">
-          <span className="eyebrow">YOUR BUSINESS. YOUR WAY.</span>
-          <h2>
-            <span>
-              Don’t adapt your business
-              <br />
-              to software.
-            </span>
-            <br />
-            Build software around
-            <br />
-            your <span className="gradient-text">business.</span>
-          </h2>
-          <div className="statement-foot">
-            <span className="statement-line" />
-            <p>
-              The right technology should fit.
-              <br />
-              Not the other way around.
-            </p>
-          </div>
-        </div>
-      </section>
-      <section className="section container process">
-        <div className="section-heading">
+      <section className="home-next">
+        <div className="container home-next-inner">
           <div>
-            <span className="eyebrow">02 / THE WAY WE WORK</span>
-            <h2>A clear path forward.</h2>
+            <span className="eyebrow">A CLEAR WAY FORWARD</span>
+            <h2>Start with the business problem.</h2>
+            <p>We’ll help shape the right product, system or improvement.</p>
           </div>
-          <p>
-            No complicated starting point.
-            <br />
-            Just a conversation.
-          </p>
-        </div>
-        <div className="process-grid" aria-label="How Khalq works">
-          {process.map((p, i) => (
-            <div key={p.name} className="process-step">
-              <div className="process-number">
-                <span>0{i + 1}</span>
-                <Arrow />
-              </div>
-              <h3>{p.name}</h3>
-              <p>{p.text}</p>
-            </div>
-          ))}
+          <div className="home-next-links">
+            <Link href="/solutions">
+              Explore solutions <Arrow />
+            </Link>
+            <Link href="/process">
+              See how we work <Arrow />
+            </Link>
+            <Link className="button" href="#project">
+              Start a Project <Arrow />
+            </Link>
+          </div>
         </div>
       </section>
-      <section className="section container products-section">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">03 / OUR OWN CREATIONS</span>
-            <h2>Built by Khalq.</h2>
-          </div>
-          <p>
-            We’re turning real business problems
-            <br />
-            into useful products.
-          </p>
-        </div>
-        <ProductsBlock />
-      </section>
-      <Closing />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

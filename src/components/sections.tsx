@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Arrow, Mark } from "./brand";
-import { services, products } from "@/lib/content";
+import { homeFocus, services, products } from "@/lib/content";
 import { ProjectForm } from "./project-form";
 export function SolutionsGrid({ detailed = false }: { detailed?: boolean }) {
   return (
@@ -76,6 +76,24 @@ export function ProductsBlock({ overview = true }: { overview?: boolean }) {
           <Arrow diagonal />
         </Link>
       )}
+    </div>
+  );
+}
+export function HomeFocus() {
+  return (
+    <div className="focus-grid">
+      {homeFocus.map((item, index) => (
+        <Link className="focus-card" href={item.href} key={item.label}>
+          <div className="focus-top">
+            <span className="eyebrow">{item.label}</span>
+            <span className="service-number">0{index + 1}</span>
+          </div>
+          <h3>
+            {item.title} <Arrow diagonal />
+          </h3>
+          <p>{item.text}</p>
+        </Link>
+      ))}
     </div>
   );
 }

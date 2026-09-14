@@ -1,4 +1,5 @@
 import { Closing } from "@/components/sections";
+import { principles } from "@/lib/content";
 export const metadata = {
   title: "About",
   description:
@@ -35,6 +36,30 @@ export default function About() {
           <h2>Khalq. Creation.</h2>
           <p>A simple idea that guides everything we do.</p>
           <h3>Create something useful.</h3>
+        </div>
+      </section>
+      <section className="content-band">
+        <div className="container">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">WHAT GUIDES THE WORK</span>
+              <h2>Useful before impressive.</h2>
+            </div>
+            <p>
+              Clear thinking, practical technology
+              <br />
+              and products people can actually use.
+            </p>
+          </div>
+          <div className="principles-grid">
+            {principles.map((principle, index) => (
+              <article key={principle.title}>
+                <span>0{index + 1}</span>
+                <h3>{principle.title}</h3>
+                <p>{principle.text}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
       <Closing />

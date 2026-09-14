@@ -1,6 +1,8 @@
 export const pages = [
   "/",
   "/solutions",
+  "/use-cases",
+  "/process",
   "/products",
   "/about",
   "/privacy",

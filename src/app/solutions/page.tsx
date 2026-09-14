@@ -1,4 +1,5 @@
 import { SolutionsGrid, Closing } from "@/components/sections";
+import { engagementTypes } from "@/lib/content";
 export const metadata = {
   title: "Solutions",
   description:
@@ -23,6 +24,29 @@ export default function Solutions() {
       </section>
       <section className="container page-solutions">
         <SolutionsGrid detailed />
+      </section>
+      <section className="content-band">
+        <div className="container content-band-inner">
+          <div className="content-band-heading">
+            <span className="eyebrow">WAYS TO BEGIN</span>
+            <h2>Start where the need is clearest.</h2>
+            <p>
+              You do not need a finished specification. A business problem,
+              opportunity or early idea is enough to begin.
+            </p>
+          </div>
+          <div className="content-list">
+            {engagementTypes.map((item, index) => (
+              <article key={item.title}>
+                <span>0{index + 1}</span>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
       <Closing />
     </main>

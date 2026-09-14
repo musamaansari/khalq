@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Brand, Arrow } from "./brand";
-import { navigation, contact } from "@/lib/content";
+import { navigation, footerNavigation, contact } from "@/lib/content";
 import {
   track,
   visitorContext,
@@ -97,7 +97,7 @@ export function Footer({
           <p>Create what’s next.</p>
         </div>
         <nav aria-label="Footer navigation">
-          {navigation.map((n) => (
+          {footerNavigation.map((n) => (
             <Link key={n.href} href={n.href}>
               {n.label}
             </Link>
